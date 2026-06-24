@@ -1,0 +1,59 @@
+<div class="magic-translation-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b data-i18n-plugin="settings_title">Magic Translation Pro</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <div class="flex-container">
+                <label for="ui_language" data-i18n-plugin="settings_ui_language">UI Language</label>
+                <select id="ui_language" class="text_pole ui_language">
+                    <option value="zh-CN" data-i18n-plugin="lang_zh-CN">中文</option>
+                    <option value="en" data-i18n-plugin="lang_en">English</option>
+                </select>
+
+                <label for="api_url" data-i18n-plugin="settings_api_url">API URL</label>
+                <input id="api_url" class="text_pole api_url" type="text" placeholder="https://api.openai.com/v1" spellcheck="false" />
+
+                <label for="api_key" data-i18n-plugin="settings_api_key">API Key</label>
+                <input id="api_key" class="text_pole api_key" type="password" placeholder="sk-..." spellcheck="false" />
+
+                <label for="model" data-i18n-plugin="settings_model">Model</label>
+                <div class="flex-container" style="gap:4px">
+                    <input id="model" class="text_pole model" type="text" list="model_list" data-i18n-plugin="[placeholder]settings_model_placeholder" placeholder="gpt-4o-mini, deepseek-chat, ..." spellcheck="false" style="flex:1" />
+                    <button class="menu_button fa-solid fa-rotate refresh_models interactable" data-i18n-plugin="[title]tooltip_refresh_models" title="Fetch available models from API"></button>
+                </div>
+                <datalist id="model_list" class="model_list"></datalist>
+
+                <label for="target_language" data-i18n-plugin="settings_target_language">Display Language  —  AI responses shown in this language</label>
+                <select id="target_language" class="text_pole target_language">
+                    {{#each languageCodes}}
+                    <option value="{{@key}}" {{#if this.selected}}selected{{/if}}>{{this.name}}</option>
+                    {{/each}}
+                </select>
+
+                <label for="input_language" data-i18n-plugin="settings_input_language">Input Language  —  Your messages translated to this language before sending</label>
+                <select id="input_language" class="text_pole input_language">
+                    {{#each inputLanguageCodes}}
+                    <option value="{{@key}}" {{#if this.selected}}selected{{/if}}>{{this.name}}</option>
+                    {{/each}}
+                </select>
+
+                <label for="auto_mode" data-i18n-plugin="settings_auto_mode">Auto Mode</label>
+                <select id="auto_mode" class="text_pole auto_mode">
+                    <option value="none" data-i18n-plugin="settings_auto_mode_none">None</option>
+                    <option value="responses" data-i18n-plugin="settings_auto_mode_responses">Translate responses</option>
+                    <option value="inputs" data-i18n-plugin="settings_auto_mode_inputs">Translate inputs</option>
+                    <option value="both" data-i18n-plugin="settings_auto_mode_both">Translate both</option>
+                </select>
+
+                <div class="title_restorable" style="width:100%">
+                    <label for="prompt" data-i18n-plugin="settings_prompt">Translation Prompt</label>
+                    <button class="menu_button fa-solid fa-undo interactable restore_default" data-i18n-plugin="[title]settings_restore" title="Restore default"></button>
+                </div>
+                <textarea id="prompt" class="text_pole textarea_compact prompt" rows="5" spellcheck="false"></textarea>
+                <small data-i18n-plugin="settings_prompt_hint">Use <code>{{text}}</code> for the message content and <code>{{language}}</code> for the target language name.</small>
+            </div>
+        </div>
+    </div>
+</div>
