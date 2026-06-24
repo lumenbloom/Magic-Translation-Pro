@@ -266,7 +266,7 @@ function bindSettingsUI() {
         });
 
     el.find('.restore_default').on('click', function () {
-        el.find('.prompt').val(defaultSettings.prompt).trigger('change');
+        el.find('.prompt').val(defaultSettings.prompt!).trigger('change');
     });
 }
 

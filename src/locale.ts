@@ -100,11 +100,10 @@ export function trFmt(key: string, locale: string, params: Record<string, string
  *   data-i18n-plugin="[attr]key"               → replace attribute
  *   data-i18n-plugin="[placeholder]key;[title]key2"  → multi-key / multi-attr
  */
-export function applyPluginLocale(root: HTMLElement | JQuery<HTMLElement>, locale: string): void {
-    const el = root instanceof jQuery ? root[0] : root;
-    if (!el) return;
+export function applyPluginLocale(root: HTMLElement, locale: string): void {
+    if (!root) return;
 
-    el.querySelectorAll('[data-i18n-plugin]').forEach((node) => {
+    root.querySelectorAll('[data-i18n-plugin]').forEach((node: Element) => {
         const raw = node.getAttribute('data-i18n-plugin');
         if (!raw) return;
         // Support semicolon-delimited keys like ST does
