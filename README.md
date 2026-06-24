@@ -6,8 +6,8 @@
 
 ## 📦 安装
 
-```
 SillyTavern → Extensions → Install Extension
+```
 https://github.com/bmen25124/SillyTavern-Magic-Translation
 ```
 
@@ -97,8 +97,8 @@ https://github.com/bmen25124/SillyTavern-Magic-Translation
 
 ## 📦 Installation
 
-```
 SillyTavern → Extensions → Install Extension
+```
 https://github.com/bmen25124/SillyTavern-Magic-Translation
 ```
 
