@@ -1,6 +1,6 @@
 import { context, extensionName, updateMessageBlock } from './config';
 import { translateText } from './translate';
-import { AutoMode, defaultSettings, languageCodes } from './types/types';
+import { AutoMode, defaultSettings, defaultInputPrompt, defaultOutputPrompt, languageCodes } from './types/types';
 import { tr, trFmt, applyPluginLocale } from './locale';
 
 const incomingModes: AutoMode[] = ['responses', 'both'];
@@ -80,7 +80,10 @@ async function doTranslate(msgId: number, type: 'incoming' | 'user' | 'impersona
         return;
     }
 
-    // Pick the right target language: user input → inputLanguage, AI responses → targetLanguage
+    // Pick the right prompt and language
+    const promptTemplate = type === 'incoming'
+        ? (s.outputPrompt || s.prompt || defaultOutputPrompt)
+        : (s.inputPrompt || s.prompt || defaultInputPrompt);
     const langCode = type === 'incoming' ? s.targetLanguage : (s.inputLanguage || s.targetLanguage);
     const langName = Object.entries(languageCodes).find(([, c]) => c === langCode)?.[0] || langCode!;
 
@@ -88,7 +91,7 @@ async function doTranslate(msgId: number, type: 'incoming' | 'user' | 'impersona
     try {
         const result = await translateText(
             sourceText,
-            s.prompt!,
+            promptTemplate,
             langName,
             s.apiUrl!,
             s.apiKey || '',
@@ -139,7 +142,7 @@ async function translateTextarea() {
     const langName = Object.entries(languageCodes).find(([, c]) => c === langCode)?.[0] || langCode!;
 
     try {
-        const result = await translateText(text, s.prompt!, langName, s.apiUrl!, s.apiKey || '', s.model!);
+        const result = await translateText(text, s.inputPrompt || s.prompt || defaultInputPrompt, langName, s.apiUrl!, s.apiKey || '', s.model!);
         if (result && result !== text) {
             textarea.value = result;
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
@@ -294,15 +297,26 @@ function bindSettingsUI() {
             context.saveSettingsDebounced();
         });
 
-    el.find('.prompt')
-        .val(s.prompt ?? '')
+    el.find('.input_prompt')
+        .val(s.inputPrompt ?? s.prompt ?? '')
         .on('change', function () {
-            s.prompt = $(this).val() as string;
+            s.inputPrompt = $(this).val() as string;
             context.saveSettingsDebounced();
         });
 
-    el.find('.restore_default').on('click', function () {
-        el.find('.prompt').val(defaultSettings.prompt!).trigger('change');
+    el.find('.output_prompt')
+        .val(s.outputPrompt ?? s.prompt ?? '')
+        .on('change', function () {
+            s.outputPrompt = $(this).val() as string;
+            context.saveSettingsDebounced();
+        });
+
+    el.find('.restore_input_prompt').on('click', function () {
+        el.find('.input_prompt').val(defaultInputPrompt).trigger('change');
+    });
+
+    el.find('.restore_output_prompt').on('click', function () {
+        el.find('.output_prompt').val(defaultOutputPrompt).trigger('change');
     });
 }
 
@@ -374,7 +388,7 @@ async function initUI() {
 
         generating.push(msgId);
         try {
-            const result = await translateText(sourceText, s.prompt!, langName, s.apiUrl!, s.apiKey || '', s.model!);
+            const result = await translateText(sourceText, s.inputPrompt || s.prompt || defaultInputPrompt, langName, s.apiUrl!, s.apiKey || '', s.model!);
             if (result && result !== sourceText) {
                 msg.extra ??= {};
                 msg.extra.display_text = sourceText;
