@@ -95,8 +95,10 @@ async function doTranslate(msgId: number, type: 'incoming' | 'user' | 'impersona
             s.model!,
         );
 
-        if (type === 'user') {
-            // User input: replace the message text so the LLM gets the translation
+        if (type === 'user' || type === 'impersonate') {
+            // User input: save original for display, put translation in mes
+            msg.extra ??= {};
+            msg.extra.display_text = sourceText;
             msg.mes = result;
         } else {
             // AI response: keep original text, show translation via display_text
@@ -105,12 +107,46 @@ async function doTranslate(msgId: number, type: 'incoming' | 'user' | 'impersona
         }
 
         updateMessageBlock(msgId, msg);
-        await context.saveChat();
+
+        // Only save chat outside generation context
+        if (type === 'incoming') {
+            await context.saveChat();
+        }
     } catch (err: any) {
         console.error('Translation failed:', err);
         toast('error', __fmt('toast_translate_failed', { msg: err.message || String(err) }));
     } finally {
         generating = generating.filter(id => id !== msgId);
+    }
+}
+
+/**
+ * Translate the content of the send textarea IN PLACE.
+ * This runs BEFORE Generate reads the textarea, so the LLM receives the translated text
+ * and the message is created with the translation from the start.
+ */
+async function translateTextarea() {
+    const s = getSettings();
+    if (!s.apiUrl || !s.model) return;
+
+    const textarea = document.getElementById('send_textarea') as HTMLTextAreaElement;
+    if (!textarea || !textarea.value) return;
+
+    const text = textarea.value.trim();
+    if (!text || text.startsWith('/')) return;
+
+    const langCode = s.inputLanguage || s.targetLanguage;
+    const langName = Object.entries(languageCodes).find(([, c]) => c === langCode)?.[0] || langCode!;
+
+    try {
+        const result = await translateText(text, s.prompt!, langName, s.apiUrl!, s.apiKey || '', s.model!);
+        if (result && result !== text) {
+            textarea.value = result;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    } catch (err: any) {
+        console.error('Input translation failed, sending original text:', err);
+        // Don't block generation on translation failure
     }
 }
 
@@ -320,23 +356,48 @@ async function initUI() {
         }
     });
 
-    context.eventSource.on('impersonate_ready', (msgId: number) => {
-        if (outgoingModes.includes(getSettings().autoMode!)) {
-            doTranslate(msgId, 'impersonate');
+    // Outgoing messages: hook MESSAGE_SENT before the message is rendered or prompt built
+    // @ts-ignore
+    context.eventSource.makeFirst('message_sent', async (msgId: number) => {
+        if (!outgoingModes.includes(getSettings().autoMode!)) return;
+
+        const msg = context.chat[msgId];
+        if (!msg || !msg.is_user) return;
+
+        const s = getSettings();
+        if (!s.apiUrl || !s.model) return;
+
+        const sourceText = msg.mes;
+        if (!sourceText || generating.includes(msgId)) return;
+
+        const langName = Object.entries(languageCodes).find(([, c]) => c === (s.inputLanguage || s.targetLanguage))?.[0] || (s.inputLanguage || s.targetLanguage)!;
+
+        generating.push(msgId);
+        try {
+            const result = await translateText(sourceText, s.prompt!, langName, s.apiUrl!, s.apiKey || '', s.model!);
+            if (result && result !== sourceText) {
+                msg.extra ??= {};
+                msg.extra.display_text = sourceText;
+                msg.mes = result;
+            }
+        } catch (err: any) {
+            console.error('Translation failed:', err);
+        } finally {
+            generating = generating.filter(id => id !== msgId);
         }
     });
 
+    // Impersonate: translate textarea before it's consumed
+    context.eventSource.on('impersonate_ready', () => {
+        if (!outgoingModes.includes(getSettings().autoMode!)) return;
+        translateTextarea();
+    });
+
+    // Incoming: AI responses
     // @ts-ignore
     context.eventSource.makeFirst('character_message_rendered', (msgId: number) => {
         if (incomingModes.includes(getSettings().autoMode!)) {
             doTranslate(msgId, 'incoming');
-        }
-    });
-
-    // @ts-ignore
-    context.eventSource.makeFirst('user_message_rendered', (msgId: number) => {
-        if (outgoingModes.includes(getSettings().autoMode!)) {
-            doTranslate(msgId, 'user');
         }
     });
 }

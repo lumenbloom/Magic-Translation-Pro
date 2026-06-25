@@ -19,7 +19,7 @@ export const defaultSettings: MagicTranslationSettings = {
     inputLanguage: 'en',
     uiLanguage: 'zh-CN',
     autoMode: 'none',
-    prompt: 'Translate the following text to {{language}}. Output only the translated text, nothing else:\n\n{{text}}',
+    prompt: 'Translate the following to {{language}}. Preserve the original meaning, tone, and style exactly — including slang, casual phrasing, humor, and any implied emotions. Do NOT add explanations, notes, or anything beyond the translated text. Output ONLY the translation:\n\n{{text}}',
 };
 
 export const languageCodes: Record<string, string> = {
