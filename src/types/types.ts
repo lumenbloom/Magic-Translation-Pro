@@ -9,7 +9,13 @@ export interface MagicTranslationSettings {
     uiLanguage?: string;
     autoMode?: AutoMode;
     prompt?: string;
+    inputPrompt?: string;
+    outputPrompt?: string;
 }
+
+export const defaultInputPrompt = 'Translate the following to {{language}}. Output ONLY the translated text — no notes, no explanations:\n\n{{text}}';
+
+export const defaultOutputPrompt = 'Translate the following to {{language}}. Preserve the original meaning, tone, style, and personality completely — including slang, casual phrasing, humor, and implied emotions. Output ONLY the translated text, nothing else:\n\n{{text}}';
 
 export const defaultSettings: MagicTranslationSettings = {
     apiUrl: 'https://api.openai.com/v1',
@@ -19,7 +25,9 @@ export const defaultSettings: MagicTranslationSettings = {
     inputLanguage: 'en',
     uiLanguage: 'zh-CN',
     autoMode: 'none',
-    prompt: 'Translate the following to {{language}}. Preserve the original meaning, tone, and style exactly — including slang, casual phrasing, humor, and any implied emotions. Do NOT add explanations, notes, or anything beyond the translated text. Output ONLY the translation:\n\n{{text}}',
+    prompt: defaultOutputPrompt,
+    inputPrompt: defaultInputPrompt,
+    outputPrompt: defaultOutputPrompt,
 };
 
 export const languageCodes: Record<string, string> = {

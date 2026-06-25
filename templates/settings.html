@@ -47,12 +47,39 @@
                     <option value="both" data-i18n-plugin="settings_auto_mode_both">Translate both</option>
                 </select>
 
-                <div class="title_restorable" style="width:100%">
-                    <label for="prompt" data-i18n-plugin="settings_prompt">Translation Prompt</label>
-                    <button class="menu_button fa-solid fa-undo interactable restore_default" data-i18n-plugin="[title]settings_restore" title="Restore default"></button>
+                <div class="inline-drawer" style="width:100%">
+                    <div class="inline-drawer-toggle inline-drawer-header">
+                        <b data-i18n-plugin="settings_input_prompt">Input Prompt  —  Your messages → LLM</b>
+                        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                    </div>
+                    <div class="inline-drawer-content">
+                        <div class="flex-container">
+                            <div class="title_restorable" style="width:100%">
+                                <label for="input_prompt"></label>
+                                <button class="menu_button fa-solid fa-undo interactable restore_input_prompt" data-i18n-plugin="[title]settings_restore" title="Restore default"></button>
+                            </div>
+                            <textarea id="input_prompt" class="text_pole textarea_compact input_prompt" rows="4" spellcheck="false"></textarea>
+                            <small data-i18n-plugin="settings_prompt_hint">Use <code>{{text}}</code> for the message content and <code>{{language}}</code> for the target language name.</small>
+                        </div>
+                    </div>
                 </div>
-                <textarea id="prompt" class="text_pole textarea_compact prompt" rows="5" spellcheck="false"></textarea>
-                <small data-i18n-plugin="settings_prompt_hint">Use <code>{{text}}</code> for the message content and <code>{{language}}</code> for the target language name.</small>
+
+                <div class="inline-drawer" style="width:100%">
+                    <div class="inline-drawer-toggle inline-drawer-header">
+                        <b data-i18n-plugin="settings_output_prompt">Output Prompt  —  AI responses → Display</b>
+                        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                    </div>
+                    <div class="inline-drawer-content">
+                        <div class="flex-container">
+                            <div class="title_restorable" style="width:100%">
+                                <label for="output_prompt"></label>
+                                <button class="menu_button fa-solid fa-undo interactable restore_output_prompt" data-i18n-plugin="[title]settings_restore" title="Restore default"></button>
+                            </div>
+                            <textarea id="output_prompt" class="text_pole textarea_compact output_prompt" rows="4" spellcheck="false"></textarea>
+                            <small data-i18n-plugin="settings_prompt_hint">Use <code>{{text}}</code> for the message content and <code>{{language}}</code> for the target language name.</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
